@@ -30,57 +30,69 @@ export default function InterviewForm({
   const enhancedInfo = getModelInfo('enhanced');
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Job Description */}
+      <div className="group">
         <label
           htmlFor="jobDescription"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block font-display text-lg text-[#0F172A] mb-3"
         >
           Job Description
         </label>
-        <textarea
-          id="jobDescription"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste the full job description here..."
-          className="w-full h-48 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          required
-          minLength={20}
-          disabled={isLoading}
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Include responsibilities, requirements, and qualifications
-        </p>
+        <div className="relative">
+          <textarea
+            id="jobDescription"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            placeholder="Paste the complete job description, including responsibilities, requirements, and qualifications..."
+            className="w-full h-56 px-5 py-4 border-2 border-[#E7E5E4] rounded-xl focus:border-[#D4AF37] focus:outline-none resize-none transition-colors bg-white text-[#1C1917] placeholder:text-[#A8A29E]"
+            required
+            minLength={20}
+            disabled={isLoading}
+          />
+          <div className="absolute bottom-4 right-4 text-xs text-[#A8A29E]">
+            {jobDescription.length} characters
+          </div>
+        </div>
       </div>
 
-      <div>
+      {/* Interview Specifics */}
+      <div className="group">
         <label
           htmlFor="interviewSpecifics"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block font-display text-lg text-[#0F172A] mb-3"
         >
-          Interview Specifics
+          Interview Focus Areas
         </label>
-        <textarea
-          id="interviewSpecifics"
-          value={interviewSpecifics}
-          onChange={(e) => setInterviewSpecifics(e.target.value)}
-          placeholder="What are you specifically looking to assess in this interview? (e.g., technical skills, cultural fit, leadership experience, problem-solving ability)"
-          className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          required
-          minLength={10}
-          disabled={isLoading}
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Describe the focus areas and what you want to evaluate
-        </p>
+        <div className="relative">
+          <textarea
+            id="interviewSpecifics"
+            value={interviewSpecifics}
+            onChange={(e) => setInterviewSpecifics(e.target.value)}
+            placeholder="What specific areas do you want to assess? (e.g., technical skills, leadership experience, cultural alignment, problem-solving ability)"
+            className="w-full h-40 px-5 py-4 border-2 border-[#E7E5E4] rounded-xl focus:border-[#D4AF37] focus:outline-none resize-none transition-colors bg-white text-[#1C1917] placeholder:text-[#A8A29E]"
+            required
+            minLength={10}
+            disabled={isLoading}
+          />
+          <div className="absolute bottom-4 right-4 text-xs text-[#A8A29E]">
+            {interviewSpecifics.length} characters
+          </div>
+        </div>
       </div>
 
+      {/* Model Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Model Quality
+        <label className="block font-display text-lg text-[#0F172A] mb-4">
+          AI Model Quality
         </label>
-        <div className="space-y-3">
-          <label className="flex items-start p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Standard Model */}
+          <label className={`relative flex flex-col p-6 border-2 rounded-xl cursor-pointer transition-all ${
+            modelQuality === 'standard'
+              ? 'border-[#D4AF37] bg-gradient-to-br from-amber-50/50 to-orange-50/30'
+              : 'border-[#E7E5E4] bg-white hover:border-[#D4AF37]/50'
+          }`}>
             <input
               type="radio"
               name="modelQuality"
@@ -89,25 +101,39 @@ export default function InterviewForm({
               onChange={(e) =>
                 setModelQuality(e.target.value as ModelQuality)
               }
-              className="mt-1 mr-3"
+              className="sr-only"
               disabled={isLoading}
             />
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-900">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="font-semibold text-[#0F172A] text-base mb-1">
                   {standardInfo.name}
-                </span>
-                <span className="text-xs text-gray-500">
+                </div>
+                <div className="text-xs font-medium text-[#D4AF37]">
                   {standardInfo.pricing}
-                </span>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                {standardInfo.description}
-              </p>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                modelQuality === 'standard'
+                  ? 'border-[#D4AF37] bg-[#D4AF37]'
+                  : 'border-[#D4D4D8]'
+              }`}>
+                {modelQuality === 'standard' && (
+                  <div className="w-2 h-2 rounded-full bg-white" />
+                )}
+              </div>
             </div>
+            <p className="text-sm text-[#57534E] leading-relaxed">
+              {standardInfo.description}
+            </p>
           </label>
 
-          <label className="flex items-start p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+          {/* Enhanced Model */}
+          <label className={`relative flex flex-col p-6 border-2 rounded-xl cursor-pointer transition-all ${
+            modelQuality === 'enhanced'
+              ? 'border-[#D4AF37] bg-gradient-to-br from-amber-50/50 to-orange-50/30'
+              : 'border-[#E7E5E4] bg-white hover:border-[#D4AF37]/50'
+          }`}>
             <input
               type="radio"
               name="modelQuality"
@@ -116,32 +142,52 @@ export default function InterviewForm({
               onChange={(e) =>
                 setModelQuality(e.target.value as ModelQuality)
               }
-              className="mt-1 mr-3"
+              className="sr-only"
               disabled={isLoading}
             />
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-900">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="font-semibold text-[#0F172A] text-base mb-1">
                   {enhancedInfo.name}
-                </span>
-                <span className="text-xs text-gray-500">
+                </div>
+                <div className="text-xs font-medium text-[#D4AF37]">
                   {enhancedInfo.pricing}
-                </span>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                {enhancedInfo.description}
-              </p>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                modelQuality === 'enhanced'
+                  ? 'border-[#D4AF37] bg-[#D4AF37]'
+                  : 'border-[#D4D4D8]'
+              }`}>
+                {modelQuality === 'enhanced' && (
+                  <div className="w-2 h-2 rounded-full bg-white" />
+                )}
+              </div>
             </div>
+            <p className="text-sm text-[#57534E] leading-relaxed">
+              {enhancedInfo.description}
+            </p>
           </label>
         </div>
       </div>
 
+      {/* Submit Button */}
       <button
         type="submit"
         disabled={isLoading || !jobDescription || !interviewSpecifics}
-        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-[#0F172A] text-white py-5 px-8 rounded-xl font-semibold hover:bg-[#1E293B] disabled:bg-[#E7E5E4] disabled:text-[#A8A29E] disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
       >
-        {isLoading ? 'Generating...' : 'Generate Interview Guide'}
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-3">
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Generating...
+          </span>
+        ) : (
+          'Generate Interview Guide'
+        )}
       </button>
     </form>
   );
