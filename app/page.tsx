@@ -50,6 +50,7 @@ export default function Home() {
       });
       setModel(agendaData.model);
       setLoadingStep('rubric');
+      setIsLoading(false);
 
       // Step 2: Generate rubric
       const rubricResponse = await fetch('/api/generate/rubric', {
@@ -188,7 +189,7 @@ export default function Home() {
             <ResultsDisplay results={results} model={model} />
           )}
 
-          {isLoading && (
+          {isLoading && !results && (
             <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-white rounded-2xl p-8 shadow-2xl border border-[#E7E5E4] max-w-md">
                 <div className="flex items-center gap-4">
@@ -198,12 +199,10 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-display text-xl text-[#0F172A] mb-1">
-                      {loadingStep === 'agenda' ? 'Creating Agenda' : 'Building Rubric'}
+                      Creating Agenda
                     </h4>
                     <p className="text-sm text-[#57534E]">
-                      {loadingStep === 'agenda'
-                        ? 'Analyzing requirements and structuring timeline...'
-                        : 'Generating evaluation criteria...'}
+                      Analyzing requirements and structuring timeline...
                     </p>
                   </div>
                 </div>
