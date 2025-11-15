@@ -4,6 +4,10 @@ import { WizardProvider, useWizard } from '@/lib/wizardContext';
 import WizardLayout from './components/WizardLayout';
 import Step1_JobInput from './components/Step1_JobInput';
 import Step2_CompetencyEditor from './components/Step2_CompetencyEditor';
+import Step3_QuestionEditor from './components/Step3_QuestionEditor';
+import Step4_AgendaBuilder from './components/Step4_AgendaBuilder';
+import Step5_RubricBuilder from './components/Step5_RubricBuilder';
+import Step6_Results from './components/Step6_Results';
 
 // Main wizard content (needs to be inside WizardProvider)
 function WizardContent() {
@@ -16,37 +20,13 @@ function WizardContent() {
       case 2:
         return <Step2_CompetencyEditor />;
       case 3:
-        return (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold mb-2">STEP 3: COMING SOON</h2>
-            <p className="text-sm opacity-50">Question Editor - In Development</p>
-          </div>
-        );
+        return <Step3_QuestionEditor />;
       case 4:
-        return (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold mb-2">STEP 4: COMING SOON</h2>
-            <p className="text-sm opacity-50">Agenda Builder - In Development</p>
-          </div>
-        );
+        return <Step4_AgendaBuilder />;
       case 5:
-        return (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold mb-2">STEP 5: COMING SOON</h2>
-            <p className="text-sm opacity-50">Rubric Builder - In Development</p>
-          </div>
-        );
+        return <Step5_RubricBuilder />;
       case 6:
-        return (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold mb-2">STEP 6: COMING SOON</h2>
-            <p className="text-sm opacity-50">Results & Export - In Development</p>
-          </div>
-        );
+        return <Step6_Results />;
       default:
         return <Step1_JobInput />;
     }
