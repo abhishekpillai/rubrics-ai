@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { InterviewDuration } from '@/lib/types';
 
 interface InterviewFormProps {
   onSubmit: (
     jobDescription: string,
-    interviewSpecifics: string
+    interviewSpecifics: string,
+    duration: InterviewDuration
   ) => void;
   isLoading: boolean;
 }
@@ -16,10 +18,11 @@ export default function InterviewForm({
 }: InterviewFormProps) {
   const [jobDescription, setJobDescription] = useState('');
   const [interviewSpecifics, setInterviewSpecifics] = useState('');
+  const [duration, setDuration] = useState<InterviewDuration>(45);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(jobDescription, interviewSpecifics);
+    onSubmit(jobDescription, interviewSpecifics, duration);
   };
 
   return (
@@ -71,6 +74,37 @@ export default function InterviewForm({
           <div className="absolute bottom-4 right-4 text-xs text-[#A8A29E]">
             {interviewSpecifics.length} characters
           </div>
+        </div>
+      </div>
+
+      {/* Interview Duration */}
+      <div>
+        <label className="block font-display text-lg text-[#0F172A] mb-4">
+          Interview Duration
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {[30, 45, 60].map((mins) => (
+            <label
+              key={mins}
+              className={`relative flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                duration === mins
+                  ? 'border-[#D4AF37] bg-gradient-to-br from-amber-50/50 to-orange-50/30'
+                  : 'border-[#E7E5E4] bg-white hover:border-[#D4AF37]/50'
+              }`}
+            >
+              <input
+                type="radio"
+                name="duration"
+                value={mins}
+                checked={duration === mins}
+                onChange={(e) => setDuration(Number(e.target.value) as InterviewDuration)}
+                className="sr-only"
+                disabled={isLoading}
+              />
+              <div className="font-display text-2xl text-[#0F172A] mb-1">{mins}</div>
+              <div className="text-xs text-[#57534E]">minutes</div>
+            </label>
+          ))}
         </div>
       </div>
 

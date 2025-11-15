@@ -1,6 +1,9 @@
 // Model quality options
 export type ModelQuality = 'standard' | 'enhanced';
 
+// Interview duration options
+export type InterviewDuration = 30 | 45 | 60;
+
 // Model configuration
 export const MODELS = {
   standard: 'openai/gpt-5-mini',
@@ -11,6 +14,7 @@ export const MODELS = {
 export interface InterviewInput {
   jobDescription: string;
   interviewSpecifics: string;
+  duration: InterviewDuration;
   modelQuality?: ModelQuality;
 }
 

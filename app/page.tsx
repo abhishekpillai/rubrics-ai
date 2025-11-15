@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import InterviewForm from './components/InterviewForm';
 import ResultsDisplay from './components/ResultsDisplay';
-import { InterviewPreparation } from '@/lib/types';
+import { InterviewPreparation, InterviewDuration } from '@/lib/types';
 
 export default function Home() {
   const [results, setResults] = useState<InterviewPreparation | null>(null);
@@ -13,7 +13,8 @@ export default function Home() {
 
   const handleSubmit = async (
     jobDescription: string,
-    interviewSpecifics: string
+    interviewSpecifics: string,
+    duration: InterviewDuration
   ) => {
     setIsLoading(true);
     setError(null);
@@ -28,6 +29,7 @@ export default function Home() {
         body: JSON.stringify({
           jobDescription,
           interviewSpecifics,
+          duration,
           modelQuality: 'standard', // Always use standard model
         }),
       });

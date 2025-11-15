@@ -1,4 +1,4 @@
-import { MODELS, ModelQuality, InterviewPreparation } from './types';
+import { MODELS, ModelQuality, InterviewPreparation, InterviewDuration } from './types';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -19,6 +19,7 @@ interface OpenRouterResponse {
 export async function generateInterviewPreparation(
   jobDescription: string,
   interviewSpecifics: string,
+  duration: InterviewDuration,
   quality: ModelQuality = 'standard'
 ): Promise<{ data: InterviewPreparation; model: string }> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -66,7 +67,12 @@ ${jobDescription}
 INTERVIEW SPECIFICS:
 ${interviewSpecifics}
 
-Please provide a comprehensive interview agenda and evaluation rubric tailored to this specific role and interview focus.`;
+INTERVIEW DURATION:
+${duration} minutes
+
+IMPORTANT: The agenda must fit within the ${duration}-minute time limit. Ensure all time allocations add up to approximately ${duration} minutes total.
+
+Please provide a comprehensive interview agenda and evaluation rubric tailored to this specific role, interview focus, and time constraint.`;
 
   const messages: OpenRouterMessage[] = [
     { role: 'system', content: systemPrompt },

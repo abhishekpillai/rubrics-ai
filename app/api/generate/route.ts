@@ -7,11 +7,11 @@ export async function POST(request: NextRequest) {
     const body: InterviewInput = await request.json();
 
     // Validate input
-    if (!body.jobDescription || !body.interviewSpecifics) {
+    if (!body.jobDescription || !body.interviewSpecifics || !body.duration) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Job description and interview specifics are required',
+          error: 'Job description, interview specifics, and duration are required',
         } as GenerateResponse,
         { status: 400 }
       );
@@ -37,12 +37,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (![30, 45, 60].includes(body.duration)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Interview duration must be 30, 45, or 60 minutes',
+        } as GenerateResponse,
+        { status: 400 }
+      );
+    }
+
     const quality: ModelQuality = body.modelQuality || 'standard';
 
     // Generate interview preparation using LLM
     const { data, model } = await generateInterviewPreparation(
       body.jobDescription,
       body.interviewSpecifics,
+      body.duration,
       quality
     );
 
