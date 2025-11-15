@@ -77,111 +77,66 @@ export default function ResultsDisplay({ results, model }: ResultsDisplayProps) 
           </div>
         </div>
         <div className="p-10">
-          <div className="space-y-8">
-            {results.rubric.map((criterion, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-[#FAFAF9] to-white border border-[#E7E5E4] rounded-xl p-8"
-              >
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <h4 className="font-display text-xl text-[#0F172A]">
-                    {criterion.criterion}
-                  </h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#57534E] font-medium">Weight</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((level) => (
-                        <div
-                          key={level}
-                          className={`w-2 h-8 rounded-sm transition-all ${
-                            level <= criterion.weight
-                              ? 'bg-[#D4AF37]'
-                              : 'bg-[#E7E5E4]'
-                          }`}
-                        />
-                      ))}
+          {results.rubric.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="relative w-16 h-16 mb-4">
+                <div className="absolute inset-0 border-4 border-[#E7E5E4] rounded-full" />
+                <div className="absolute inset-0 border-4 border-[#D4AF37] rounded-full border-t-transparent animate-spin" />
+              </div>
+              <p className="text-[#57534E] text-lg">Generating evaluation criteria...</p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {results.rubric.map((criterion, index) => (
+                <div
+                  key={index}
+                  className="bg-gradient-to-br from-[#FAFAF9] to-white border border-[#E7E5E4] rounded-xl p-8"
+                >
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <h4 className="font-display text-xl text-[#0F172A]">
+                      {criterion.criterion}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[#57534E] font-medium">Weight</span>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((level) => (
+                          <div
+                            key={level}
+                            className={`w-2 h-8 rounded-sm transition-all ${
+                              level <= criterion.weight
+                                ? 'bg-[#D4AF37]'
+                                : 'bg-[#E7E5E4]'
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
+                  <p className="text-[#57534E] mb-6 leading-relaxed">
+                    {criterion.description}
+                  </p>
+                  <div className="bg-white border border-[#E7E5E4] rounded-lg p-6">
+                    <h5 className="text-xs font-semibold uppercase tracking-wide text-[#A8A29E] mb-3">
+                      Evaluation Guidelines
+                    </h5>
+                    <ul className="space-y-2">
+                      {criterion.evaluationGuidelines.map((guideline, gIndex) => (
+                        <li
+                          key={gIndex}
+                          className="flex items-start gap-3 text-sm text-[#57534E]"
+                        >
+                          <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#D4AF37] mt-2" />
+                          <span className="leading-relaxed">{guideline}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <p className="text-[#57534E] mb-6 leading-relaxed">
-                  {criterion.description}
-                </p>
-                <div className="bg-white border border-[#E7E5E4] rounded-lg p-6">
-                  <h5 className="text-xs font-semibold uppercase tracking-wide text-[#A8A29E] mb-3">
-                    Evaluation Guidelines
-                  </h5>
-                  <ul className="space-y-2">
-                    {criterion.evaluationGuidelines.map((guideline, gIndex) => (
-                      <li
-                        key={gIndex}
-                        className="flex items-start gap-3 text-sm text-[#57534E]"
-                      >
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#D4AF37] mt-2" />
-                        <span className="leading-relaxed">{guideline}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-
-      {/* Key Competencies & Red Flags Grid */}
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Key Competencies */}
-        <section className="bg-white border border-[#E7E5E4] rounded-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-50 to-green-50 px-8 py-6 border-b border-emerald-200/50">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="font-display text-xl text-[#0F172A]">Key Competencies</h3>
-            </div>
-          </div>
-          <div className="p-8">
-            <div className="flex flex-wrap gap-2">
-              {results.keyCompetencies.map((competency, index) => (
-                <span
-                  key={index}
-                  className="px-4 py-2 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-lg text-sm font-medium"
-                >
-                  {competency}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Red Flags */}
-        <section className="bg-white border border-[#E7E5E4] rounded-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-rose-50 to-red-50 px-8 py-6 border-b border-rose-200/50">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="font-display text-xl text-[#0F172A]">Red Flags</h3>
-            </div>
-          </div>
-          <div className="p-8">
-            <ul className="space-y-3">
-              {results.redFlags.map((flag, index) => (
-                <li key={index} className="flex items-start gap-3 text-sm text-[#57534E]">
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold mt-0.5">
-                    !
-                  </span>
-                  <span className="leading-relaxed">{flag}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      </div>
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-[#E7E5E4]">

@@ -9,6 +9,7 @@ export default function Home() {
   const [results, setResults] = useState<InterviewPreparation | null>(null);
   const [model, setModel] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState<'agenda' | 'rubric' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (
@@ -19,9 +20,11 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     setResults(null);
+    setLoadingStep('agenda');
 
     try {
-      const response = await fetch('/api/generate', {
+      // Step 1: Generate agenda
+      const agendaResponse = await fetch('/api/generate/agenda', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,17 +37,50 @@ export default function Home() {
         }),
       });
 
-      const data = await response.json();
+      const agendaData = await agendaResponse.json();
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to generate interview guide');
+      if (!agendaData.success) {
+        throw new Error(agendaData.error || 'Failed to generate agenda');
       }
 
-      setResults(data.data);
-      setModel(data.model);
+      // Show agenda immediately
+      setResults({
+        agenda: agendaData.data,
+        rubric: [],
+      });
+      setModel(agendaData.model);
+      setLoadingStep('rubric');
+
+      // Step 2: Generate rubric
+      const rubricResponse = await fetch('/api/generate/rubric', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobDescription,
+          interviewSpecifics,
+          duration,
+          modelQuality: 'standard', // Always use standard model
+        }),
+      });
+
+      const rubricData = await rubricResponse.json();
+
+      if (!rubricData.success) {
+        throw new Error(rubricData.error || 'Failed to generate rubric');
+      }
+
+      // Update with complete results
+      setResults({
+        agenda: agendaData.data,
+        rubric: rubricData.data,
+      });
+      setLoadingStep(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error generating interview guide:', err);
+      setLoadingStep(null);
     } finally {
       setIsLoading(false);
     }
@@ -162,10 +198,12 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-display text-xl text-[#0F172A] mb-1">
-                      Generating Your Guide
+                      {loadingStep === 'agenda' ? 'Creating Agenda' : 'Building Rubric'}
                     </h4>
                     <p className="text-sm text-[#57534E]">
-                      Analyzing requirements and crafting your interview structure...
+                      {loadingStep === 'agenda'
+                        ? 'Analyzing requirements and structuring timeline...'
+                        : 'Generating evaluation criteria...'}
                     </p>
                   </div>
                 </div>

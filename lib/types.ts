@@ -37,8 +37,6 @@ export interface AgendaItem {
 export interface InterviewPreparation {
   agenda: AgendaItem[];
   rubric: RubricCriterion[];
-  keyCompetencies: string[];
-  redFlags: string[];
   recommendedQuestions?: string[]; // For post-MVP
 }
 

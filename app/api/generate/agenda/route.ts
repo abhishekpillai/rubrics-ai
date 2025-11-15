@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateInterviewPreparation } from '@/lib/llm';
-import { GenerateResponse, InterviewInput, ModelQuality } from '@/lib/types';
+import { generateAgenda } from '@/lib/llm';
+import { InterviewInput, ModelQuality } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Job description, interview specifics, and duration are required',
-        } as GenerateResponse,
+        },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Job description must be at least 20 characters',
-        } as GenerateResponse,
+        },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Interview specifics must be at least 10 characters',
-        } as GenerateResponse,
+        },
         { status: 400 }
       );
     }
@@ -42,15 +42,15 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Interview duration must be 30, 45, or 60 minutes',
-        } as GenerateResponse,
+        },
         { status: 400 }
       );
     }
 
     const quality: ModelQuality = body.modelQuality || 'standard';
 
-    // Generate interview preparation using LLM
-    const { data, model } = await generateInterviewPreparation(
+    // Generate agenda using LLM
+    const { data, model } = await generateAgenda(
       body.jobDescription,
       body.interviewSpecifics,
       body.duration,
@@ -61,9 +61,9 @@ export async function POST(request: NextRequest) {
       success: true,
       data,
       model,
-    } as GenerateResponse);
+    });
   } catch (error) {
-    console.error('Error generating interview preparation:', error);
+    console.error('Error generating interview agenda:', error);
 
     const errorMessage =
       error instanceof Error ? error.message : 'An unknown error occurred';
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: errorMessage,
-      } as GenerateResponse,
+      },
       { status: 500 }
     );
   }
