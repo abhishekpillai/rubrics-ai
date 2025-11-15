@@ -1,6 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { InterviewPreparation } from '@/lib/types';
+import { copyToClipboard } from '@/lib/exportToClipboard';
+import { downloadAsMarkdown } from '@/lib/exportMarkdown';
 
 interface ResultsDisplayProps {
   results: InterviewPreparation;
@@ -8,6 +11,27 @@ interface ResultsDisplayProps {
 }
 
 export default function ResultsDisplay({ results, model }: ResultsDisplayProps) {
+  const [showToast, setShowToast] = useState(false);
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await copyToClipboard(results);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      alert('Failed to copy to clipboard. Please try again.');
+    }
+  };
+
+  const handleDownloadMarkdown = () => {
+    try {
+      downloadAsMarkdown(results);
+    } catch (error) {
+      console.error('Failed to download markdown:', error);
+      alert('Failed to download markdown. Please try again.');
+    }
+  };
   return (
     <div className="space-y-12 animate-fade-in-up">
       {/* Header Section */}
@@ -139,10 +163,28 @@ export default function ResultsDisplay({ results, model }: ResultsDisplayProps) 
       </section>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-[#E7E5E4]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-[#E7E5E4]">
+        <button
+          onClick={handleCopyToClipboard}
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Copy to Google Docs
+        </button>
+        <button
+          onClick={handleDownloadMarkdown}
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-white border-2 border-[#E7E5E4] text-[#0F172A] rounded-xl font-semibold hover:border-[#D4AF37] hover:bg-amber-50/30 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Download Markdown
+        </button>
         <button
           onClick={() => window.print()}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-white border-2 border-[#E7E5E4] text-[#0F172A] rounded-xl font-semibold hover:border-[#D4AF37] hover:bg-amber-50/30 transition-all"
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-white border-2 border-[#E7E5E4] text-[#0F172A] rounded-xl font-semibold hover:border-[#D4AF37] hover:bg-amber-50/30 transition-all"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -151,7 +193,7 @@ export default function ResultsDisplay({ results, model }: ResultsDisplayProps) 
         </button>
         <button
           onClick={() => window.location.reload()}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[#0F172A] text-white rounded-xl font-semibold hover:bg-[#1E293B] transition-all shadow-sm hover:shadow-md"
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-[#0F172A] text-white rounded-xl font-semibold hover:bg-[#1E293B] transition-all shadow-sm hover:shadow-md"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -159,6 +201,21 @@ export default function ResultsDisplay({ results, model }: ResultsDisplayProps) 
           Create New Guide
         </button>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-8 right-8 z-50 animate-fade-in-up">
+          <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-4 rounded-xl shadow-2xl border border-emerald-400 flex items-center gap-3">
+            <svg className="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="font-semibold">Copied to clipboard!</p>
+              <p className="text-sm text-emerald-50">Open Google Docs and paste (Cmd/Ctrl+V)</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
