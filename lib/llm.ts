@@ -123,14 +123,14 @@ Please provide a comprehensive interview agenda and evaluation rubric tailored t
 export function getModelInfo(quality: ModelQuality) {
   const modelMap = {
     standard: {
-      name: 'GPT-5 Mini',
-      description: 'Fast and cost-effective',
-      pricing: '$0.25/1M input tokens',
+      name: 'Standard Quality',
+      description: 'Fast generation with reliable results for most interviews',
+      pricing: '$0.25 per generation',
     },
     enhanced: {
-      name: 'Claude 3.5 Sonnet',
-      description: 'Superior reasoning and evaluation quality',
-      pricing: '$3/1M input tokens',
+      name: 'Premium Quality',
+      description: 'Advanced reasoning for complex roles and nuanced evaluations',
+      pricing: '$3 per generation',
     },
   };
 

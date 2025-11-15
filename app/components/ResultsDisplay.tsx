@@ -19,14 +19,9 @@ export default function ResultsDisplay({ results, model }: ResultsDisplayProps) 
               Generated Guide
             </span>
           </div>
-          <h2 className="font-display text-4xl mb-3">
+          <h2 className="font-display text-4xl">
             Your Interview Preparation
           </h2>
-          {model && (
-            <p className="text-sm text-gray-300">
-              Crafted using {model.replace('anthropic/', '').replace('openai/', '')}
-            </p>
-          )}
         </div>
       </div>
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import InterviewForm from './components/InterviewForm';
 import ResultsDisplay from './components/ResultsDisplay';
-import { InterviewPreparation, ModelQuality } from '@/lib/types';
+import { InterviewPreparation } from '@/lib/types';
 
 export default function Home() {
   const [results, setResults] = useState<InterviewPreparation | null>(null);
@@ -13,8 +13,7 @@ export default function Home() {
 
   const handleSubmit = async (
     jobDescription: string,
-    interviewSpecifics: string,
-    modelQuality: ModelQuality
+    interviewSpecifics: string
   ) => {
     setIsLoading(true);
     setError(null);
@@ -29,7 +28,7 @@ export default function Home() {
         body: JSON.stringify({
           jobDescription,
           interviewSpecifics,
-          modelQuality,
+          modelQuality: 'standard', // Always use standard model
         }),
       });
 
@@ -74,22 +73,6 @@ export default function Home() {
                 Craft structured interview agendas and precise evaluation rubrics—tailored
                 to your hiring needs with AI-driven insights.
               </p>
-            </div>
-          </div>
-
-          {/* Stats bar */}
-          <div className="flex gap-12 pt-8 border-t border-[#E7E5E4]">
-            <div>
-              <div className="font-display text-3xl text-[#D4AF37] mb-1">2</div>
-              <div className="text-sm text-[#57534E]">AI Models</div>
-            </div>
-            <div>
-              <div className="font-display text-3xl text-[#D4AF37] mb-1">4</div>
-              <div className="text-sm text-[#57534E]">Output Sections</div>
-            </div>
-            <div>
-              <div className="font-display text-3xl text-[#D4AF37] mb-1">&lt;30s</div>
-              <div className="text-sm text-[#57534E]">Generation Time</div>
             </div>
           </div>
         </header>
@@ -191,26 +174,9 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="mt-32 pt-12 border-t border-[#E7E5E4] animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <div className="font-display text-2xl text-[#0F172A] mb-2">Rubrics AI</div>
-              <p className="text-sm text-[#57534E]">
-                Powered by{' '}
-                <a
-                  href="https://openrouter.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#D4AF37] hover:underline font-medium"
-                >
-                  OpenRouter
-                </a>
-              </p>
-            </div>
-            <div className="flex gap-6 text-sm text-[#57534E]">
-              <span>GPT-5 Mini</span>
-              <span>•</span>
-              <span>Claude 3.5 Sonnet</span>
-            </div>
+          <div className="text-center">
+            <div className="font-display text-2xl text-[#0F172A] mb-2">Rubrics AI</div>
+            <p className="text-sm text-[#57534E]">© 2025 Rubrics AI. All rights reserved.</p>
           </div>
         </footer>
       </div>
