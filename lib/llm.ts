@@ -1,4 +1,14 @@
-import { MODELS, ModelQuality, AgendaItem, RubricCriterion, InterviewDuration } from './types';
+import {
+  MODELS,
+  ModelQuality,
+  AgendaItem,
+  RubricCriterion,
+  LegacyRubricCriterion,
+  InterviewDuration,
+  Competency,
+  Question,
+  RubricLevel
+} from './types';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -192,6 +202,106 @@ Please provide a focused evaluation rubric (max 5 criteria) tailored to this spe
 
     return {
       data: parsedData.rubric,
+      model: data.model,
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Failed to parse LLM response as JSON');
+    }
+    throw error;
+  }
+}
+
+// New competency-first workflow functions
+
+export async function extractCompetencies(
+  jobDescription: string,
+  quality: ModelQuality = 'standard'
+): Promise<{ data: Competency[]; model: string }> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OPENROUTER_API_KEY is not configured');
+  }
+
+  const model = MODELS[quality];
+
+  const systemPrompt = `You are an expert in evidence-based hiring practices. Your task is to extract 3-5 critical competencies from a job description.
+
+IMPORTANT GUIDELINES:
+- Focus on JOB-RELEVANT competencies only, not vague "culture fit"
+- Use behavioral language that describes observable skills/abilities
+- Each competency should map to specific work outcomes
+- Avoid bias-prone attributes like "communication style" or "executive presence"
+- Prioritize competencies that predict job performance
+
+Provide your response as a valid JSON object with this exact structure:
+{
+  "competencies": [
+    {
+      "id": "comp-1",
+      "name": "Competency name (2-4 words)",
+      "description": "Behavioral description of what this competency looks like in practice (1-2 sentences)",
+      "weight": 4,
+      "isRequired": true
+    }
+  ]
+}
+
+Use weights 1-5 where 5 is most critical. Mark 1-2 competencies as isRequired:true (must-haves).`;
+
+  const userPrompt = `Extract the 3-5 most critical competencies from this job description:
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Focus on competencies that are:
+1. Directly tied to the role's core responsibilities
+2. Observable and measurable through interview questions
+3. Predictive of success in this specific position`;
+
+  const messages: OpenRouterMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ];
+
+  try {
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        'X-Title': 'Rubrics AI - Competency Extraction',
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `OpenRouter API error: ${response.status} ${response.statusText}. ${
+          errorData.error?.message || ''
+        }`
+      );
+    }
+
+    const data: OpenRouterResponse = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('No content received from OpenRouter');
+    }
+
+    const parsedData: { competencies: Competency[] } = JSON.parse(content);
+
+    return {
+      data: parsedData.competencies,
       model: data.model,
     };
   } catch (error) {
