@@ -84,28 +84,13 @@ export default function Step5_RubricBuilder() {
         </p>
       </div>
 
-      {/* Generate Button */}
+      {/* Show message if no rubric yet */}
       {state.rubric.length === 0 && (
-        <div className="mb-8">
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="border-2 border-black px-8 py-4 text-sm font-bold bg-black text-white hover:bg-gray-900 transition-colors disabled:opacity-50"
-          >
-            {isGenerating ? 'GENERATING RUBRIC...' : 'GENERATE RUBRIC →'}
-          </button>
-          <p className="text-xs opacity-50 mt-2">
-            AI will create 4-level behaviorally anchored scales for each competency
+        <div className="border-2 border-black p-8 text-center mb-8">
+          <p className="text-sm font-bold mb-2">NO RUBRIC YET</p>
+          <p className="text-xs opacity-70">
+            Rubric is auto-generated when you continue from Step 4
           </p>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isGenerating && (
-        <div className="border-2 border-black p-12 text-center">
-          <div className="inline-block w-8 h-8 border-2 border-black border-t-transparent animate-spin mb-4" />
-          <p className="text-sm font-bold">GENERATING EVALUATION RUBRIC...</p>
-          <p className="text-xs opacity-50 mt-2">Creating behaviorally anchored rating scales</p>
         </div>
       )}
 

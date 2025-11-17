@@ -5,12 +5,13 @@ import { useWizard } from '@/lib/wizardContext';
 import { InterviewDuration } from '@/lib/types';
 
 export default function Step1_JobInput() {
-  const { state, setJobDescription, setDuration, nextStep } = useWizard();
+  const { state, setJobDescription, setDuration, setCompetencies, nextStep } = useWizard();
   const [localJD, setLocalJD] = useState(state.jobDescription);
   const [localDuration, setLocalDuration] = useState(state.duration);
   const [error, setError] = useState('');
+  const [isExtracting, setIsExtracting] = useState(false);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     // Validation
     if (localJD.trim().length < 100) {
       setError('Job description must be at least 100 characters');
@@ -19,7 +20,34 @@ export default function Step1_JobInput() {
 
     setJobDescription(localJD);
     setDuration(localDuration);
-    nextStep();
+
+    // Auto-extract competencies before moving to step 2
+    setIsExtracting(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/extract/competencies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobDescription: localJD,
+          modelQuality: 'standard',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to extract competencies');
+      }
+
+      setCompetencies(result.data);
+      nextStep();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to extract competencies');
+    } finally {
+      setIsExtracting(false);
+    }
   };
 
   const charCount = localJD.length;
@@ -108,20 +136,21 @@ Key Responsibilities:
       <div className="flex items-center gap-4">
         <button
           onClick={handleContinue}
-          disabled={!isValid}
+          disabled={!isValid || isExtracting}
           className={`
             border-2 border-black px-8 py-4 text-sm font-bold transition-colors
             ${
-              isValid
+              isValid && !isExtracting
                 ? 'bg-black text-white hover:bg-gray-900'
                 : 'opacity-30 cursor-not-allowed'
             }
           `}
         >
-          CONTINUE →
+          {isExtracting ? 'EXTRACTING COMPETENCIES...' : 'CONTINUE →'}
         </button>
         <div className="text-xs opacity-50">
           {!isValid && 'Add more detail to continue'}
+          {isExtracting && 'Analyzing job description...'}
         </div>
       </div>
 

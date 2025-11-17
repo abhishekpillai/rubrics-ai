@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
 import { AgendaItem } from '@/lib/types';
 
 export default function Step4_AgendaBuilder() {
-  const { state, setAgenda, nextStep, prevStep } = useWizard();
+  const { state, setAgenda, setRubric, nextStep, prevStep } = useWizard();
+  const [isGeneratingRubric, setIsGeneratingRubric] = useState(false);
+  const [error, setError] = useState('');
 
   // Auto-generate agenda from questions on mount
   useEffect(() => {
@@ -53,8 +55,34 @@ export default function Step4_AgendaBuilder() {
 
   const isExactMatch = totalTime === state.duration;
 
-  const handleContinue = () => {
-    nextStep();
+  const handleContinue = async () => {
+    // Auto-generate rubric before moving to step 5
+    setIsGeneratingRubric(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/generate/rubric-from-competencies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          competencies: state.competencies,
+          modelQuality: 'standard',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to generate rubric');
+      }
+
+      setRubric(result.data);
+      nextStep();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate rubric');
+    } finally {
+      setIsGeneratingRubric(false);
+    }
   };
 
   return (
@@ -130,20 +158,45 @@ export default function Step4_AgendaBuilder() {
         })}
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="mb-8 border-2 border-black bg-white p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-xl">⚠</span>
+            <div>
+              <div className="font-bold text-sm mb-1">ERROR</div>
+              <div className="text-sm">{error}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="flex items-center gap-4 mt-8">
         <button
           onClick={prevStep}
-          className="border-2 border-black px-8 py-4 text-sm font-bold hover:bg-gray-100 transition-colors"
+          disabled={isGeneratingRubric}
+          className="border-2 border-black px-8 py-4 text-sm font-bold hover:bg-gray-100 transition-colors disabled:opacity-30"
         >
           ← BACK
         </button>
         <button
           onClick={handleContinue}
-          className="border-2 border-black px-8 py-4 text-sm font-bold bg-black text-white hover:bg-gray-900 transition-colors"
+          disabled={isGeneratingRubric}
+          className={`
+            border-2 border-black px-8 py-4 text-sm font-bold transition-colors
+            ${
+              !isGeneratingRubric
+                ? 'bg-black text-white hover:bg-gray-900'
+                : 'opacity-30 cursor-not-allowed'
+            }
+          `}
         >
-          CONTINUE →
+          {isGeneratingRubric ? 'GENERATING RUBRIC...' : 'CONTINUE →'}
         </button>
+        <div className="text-xs opacity-50">
+          {isGeneratingRubric && 'Creating evaluation rubric...'}
+        </div>
       </div>
 
       {/* Info Box */}

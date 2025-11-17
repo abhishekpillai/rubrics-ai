@@ -5,7 +5,7 @@ import { useWizard } from '@/lib/wizardContext';
 import { Competency } from '@/lib/types';
 
 export default function Step2_CompetencyEditor() {
-  const { state, setCompetencies, updateCompetency, deleteCompetency, nextStep, prevStep } = useWizard();
+  const { state, setCompetencies, updateCompetency, deleteCompetency, setQuestions, nextStep, prevStep } = useWizard();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -50,7 +50,9 @@ export default function Step2_CompetencyEditor() {
     setEditingId(newComp.id);
   };
 
-  const handleContinue = () => {
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+
+  const handleContinue = async () => {
     if (state.competencies.length < 3) {
       setError('You need at least 3 competencies');
       return;
@@ -59,7 +61,35 @@ export default function Step2_CompetencyEditor() {
       setError('You should have maximum 5 competencies');
       return;
     }
-    nextStep();
+
+    // Auto-generate questions before moving to step 3
+    setIsGeneratingQuestions(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/generate/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          competencies: state.competencies,
+          duration: state.duration,
+          modelQuality: 'standard',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to generate questions');
+      }
+
+      setQuestions(result.data);
+      nextStep();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate questions');
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
   };
 
   const isValid = state.competencies.length >= 3 && state.competencies.length <= 5;
@@ -74,28 +104,13 @@ export default function Step2_CompetencyEditor() {
         </p>
       </div>
 
-      {/* Extract Button (show if no competencies) */}
+      {/* Show message if no competencies yet */}
       {state.competencies.length === 0 && (
-        <div className="mb-8">
-          <button
-            onClick={handleExtract}
-            disabled={isGenerating}
-            className="border-2 border-black px-8 py-4 text-sm font-bold bg-black text-white hover:bg-gray-900 transition-colors disabled:opacity-50"
-          >
-            {isGenerating ? 'EXTRACTING COMPETENCIES...' : 'EXTRACT COMPETENCIES →'}
-          </button>
-          <p className="text-xs opacity-50 mt-2">
-            AI will analyze the job description and identify key evaluation dimensions
+        <div className="border-2 border-black p-8 text-center mb-8">
+          <p className="text-sm font-bold mb-2">NO COMPETENCIES YET</p>
+          <p className="text-xs opacity-70">
+            Competencies are auto-extracted when you continue from Step 1
           </p>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isGenerating && (
-        <div className="border-2 border-black p-12 text-center">
-          <div className="inline-block w-8 h-8 border-2 border-black border-t-transparent animate-spin mb-4" />
-          <p className="text-sm font-bold">ANALYZING JOB DESCRIPTION...</p>
-          <p className="text-xs opacity-50 mt-2">Extracting critical competencies</p>
         </div>
       )}
 
@@ -237,28 +252,30 @@ export default function Step2_CompetencyEditor() {
       <div className="flex items-center gap-4">
         <button
           onClick={prevStep}
-          className="border-2 border-black px-8 py-4 text-sm font-bold hover:bg-gray-100 transition-colors"
+          disabled={isGeneratingQuestions}
+          className="border-2 border-black px-8 py-4 text-sm font-bold hover:bg-gray-100 transition-colors disabled:opacity-30"
         >
           ← BACK
         </button>
         <button
           onClick={handleContinue}
-          disabled={!isValid}
+          disabled={!isValid || isGeneratingQuestions}
           className={`
             border-2 border-black px-8 py-4 text-sm font-bold transition-colors
             ${
-              isValid
+              isValid && !isGeneratingQuestions
                 ? 'bg-black text-white hover:bg-gray-900'
                 : 'opacity-30 cursor-not-allowed'
             }
           `}
         >
-          CONTINUE →
+          {isGeneratingQuestions ? 'GENERATING QUESTIONS...' : 'CONTINUE →'}
         </button>
         <div className="text-xs opacity-50">
           {!isValid &&
             state.competencies.length > 0 &&
             `Need ${3 - state.competencies.length} more competencies`}
+          {isGeneratingQuestions && 'Creating interview questions...'}
         </div>
       </div>
 
