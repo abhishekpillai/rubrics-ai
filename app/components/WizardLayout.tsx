@@ -6,11 +6,11 @@ import { WizardStep } from '@/lib/types';
 const STEP_LABELS = [
   { number: 1, label: 'Job Description' },
   { number: 2, label: 'Define Competencies' },
-  { number: 2.5, label: 'Interview Focus' },
-  { number: 3, label: 'Generate Questions' },
-  { number: 4, label: 'Build Agenda' },
-  { number: 5, label: 'Review Rubric' },
-  { number: 6, label: 'Results' },
+  { number: 3, label: 'Edit Rubric' },
+  { number: 4, label: 'Interview Focus' },
+  { number: 5, label: 'Edit Questions' },
+  { number: 6, label: 'Build Agenda' },
+  { number: 7, label: 'Results' },
 ];
 
 interface WizardLayoutProps {
@@ -27,8 +27,8 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
     }
   };
 
-  // Calculate progress accounting for step 2.5
-  const stepOrder = [1, 2, 2.5, 3, 4, 5, 6];
+  // Calculate progress for 7 steps
+  const stepOrder = [1, 2, 3, 4, 5, 6, 7];
   const currentStepIndex = stepOrder.indexOf(state.step);
   const progressPercent = (currentStepIndex / (stepOrder.length - 1)) * 100;
 

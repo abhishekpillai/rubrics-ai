@@ -92,7 +92,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const goToStep = (step: WizardStep) => updateState({ step });
 
   const nextStep = () => {
-    const stepOrder = [1, 2, 2.5, 3, 4, 5, 6] as const;
+    const stepOrder = [1, 2, 3, 4, 5, 6, 7] as const;
     const currentIndex = stepOrder.indexOf(state.step as typeof stepOrder[number]);
     if (currentIndex < stepOrder.length - 1) {
       updateState({ step: stepOrder[currentIndex + 1] });
@@ -100,7 +100,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   };
 
   const prevStep = () => {
-    const stepOrder = [1, 2, 2.5, 3, 4, 5, 6] as const;
+    const stepOrder = [1, 2, 3, 4, 5, 6, 7] as const;
     const currentIndex = stepOrder.indexOf(state.step as typeof stepOrder[number]);
     if (currentIndex > 0) {
       updateState({ step: stepOrder[currentIndex - 1] });

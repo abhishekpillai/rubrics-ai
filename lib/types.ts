@@ -10,13 +10,7 @@ export const MODELS = {
   enhanced: 'anthropic/claude-3.5-sonnet',
 } as const;
 
-// Interview input data
-export interface InterviewInput {
-  jobDescription: string;
-  interviewSpecifics: string;
-  duration: InterviewDuration;
-  modelQuality?: ModelQuality;
-}
+// Interview input data removed - using wizard flow now
 
 // Competency - core evaluation dimension
 export interface Competency {
@@ -59,13 +53,7 @@ export interface RubricCriterion {
   nonSignals?: string[]; // Things that should NOT be evaluated (equity focus)
 }
 
-// Legacy rubric format (for backwards compatibility)
-export interface LegacyRubricCriterion {
-  criterion: string;
-  description: string;
-  weight: number;
-  evaluationGuidelines: string[];
-}
+// Legacy rubric format removed - using BARS now
 
 // Agenda item
 export interface AgendaItem {
@@ -78,8 +66,8 @@ export interface AgendaItem {
 // Interview type options
 export type InterviewType = 'technical' | 'behavioral' | 'system-design' | 'domain' | 'custom';
 
-// Wizard step (includes new step 2.5 for interview focus)
-export type WizardStep = 1 | 2 | 2.5 | 3 | 4 | 5 | 6;
+// Wizard step (7 sequential steps)
+export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 // Wizard state (complete interview design session)
 export interface WizardState {
@@ -103,28 +91,4 @@ export interface WizardState {
   lastModified: string;
 }
 
-// Generated interview preparation (legacy format)
-export interface InterviewPreparation {
-  agenda: AgendaItem[];
-  rubric: LegacyRubricCriterion[];
-  recommendedQuestions?: string[];
-}
-
-// New interview preparation format (wizard-based)
-export interface InterviewGuide {
-  jobDescription: string;
-  duration: InterviewDuration;
-  competencies: Competency[];
-  questions: Question[];
-  agenda: AgendaItem[];
-  rubric: RubricCriterion[];
-  createdAt: string;
-}
-
-// API response
-export interface GenerateResponse {
-  success: boolean;
-  data?: InterviewPreparation;
-  error?: string;
-  model?: string;
-}
+// Legacy InterviewPreparation and GenerateResponse removed - using wizard flow now

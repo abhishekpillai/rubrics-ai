@@ -4,11 +4,11 @@ import { WizardProvider, useWizard } from '@/lib/wizardContext';
 import WizardLayout from './components/WizardLayout';
 import Step1_JobInput from './components/Step1_JobInput';
 import Step2_CompetencyEditor from './components/Step2_CompetencyEditor';
-import Step2_5_InterviewFocus from './components/Step2_5_InterviewFocus';
-import Step3_QuestionEditor from './components/Step3_QuestionEditor';
-import Step4_AgendaBuilder from './components/Step4_AgendaBuilder';
-import Step5_RubricBuilder from './components/Step5_RubricBuilder';
-import Step6_Results from './components/Step6_Results';
+import Step3_RubricEditor from './components/Step3_RubricEditor';
+import Step4_InterviewFocus from './components/Step4_InterviewFocus';
+import Step5_QuestionEditor from './components/Step5_QuestionEditor';
+import Step6_AgendaBuilder from './components/Step6_AgendaBuilder';
+import Step7_Results from './components/Step7_Results';
 
 // Main wizard content (needs to be inside WizardProvider)
 function WizardContent() {
@@ -20,16 +20,16 @@ function WizardContent() {
         return <Step1_JobInput />;
       case 2:
         return <Step2_CompetencyEditor />;
-      case 2.5:
-        return <Step2_5_InterviewFocus />;
       case 3:
-        return <Step3_QuestionEditor />;
+        return <Step3_RubricEditor />;
       case 4:
-        return <Step4_AgendaBuilder />;
+        return <Step4_InterviewFocus />;
       case 5:
-        return <Step5_RubricBuilder />;
+        return <Step5_QuestionEditor />;
       case 6:
-        return <Step6_Results />;
+        return <Step6_AgendaBuilder />;
+      case 7:
+        return <Step7_Results />;
       default:
         return <Step1_JobInput />;
     }

@@ -37,18 +37,24 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # Optional, for OpenRouter rankings
 
 ## Architecture Overview
 
-### 6-Step Wizard Flow
+### 7-Step Wizard Flow
 
-The application implements a competency-first workflow with automatic generation at each transition:
+The application implements a competency-first workflow with automatic generation at key transitions:
 
 1. **Step 1 (JobInput)** → Extracts competencies via LLM
-2. **Step 2 (CompetencyEditor)** → Generates questions via LLM
-3. **Step 3 (QuestionEditor)** → User edits questions
-4. **Step 4 (AgendaBuilder)** → Auto-generates agenda from questions
-5. **Step 5 (RubricBuilder)** → Generates BARS rubric via LLM
-6. **Step 6 (Results)** → Export (text/markdown/print)
+2. **Step 2 (CompetencyEditor)** → Generates role-level rubrics via LLM
+3. **Step 3 (RubricEditor)** → Edit BARS rubrics for ALL competencies
+4. **Step 4 (InterviewFocus)** → Select 1-3 competencies for THIS interview → Generates questions via LLM
+5. **Step 5 (QuestionEditor)** → Edit questions for selected competencies
+6. **Step 6 (AgendaBuilder)** → Auto-generates timeline from questions
+7. **Step 7 (Results)** → Export (text/markdown/print)
 
-**Auto-trigger Pattern:** Steps automatically trigger LLM generation on "CONTINUE" button. Each step validates input before progressing.
+**Auto-trigger Pattern:** Steps 2, 4, and 6 automatically trigger LLM generation on "CONTINUE". Each step validates input before progressing.
+
+**Key Architecture:**
+- Rubrics are generated at the **role level** (Step 2) for ALL 3-5 competencies
+- Interview focus (Step 4) selects **1-3 competencies** to assess in ONE interview
+- Questions and agenda are **interview-specific** based on selected competencies
 
 ### State Management
 
@@ -56,13 +62,22 @@ All application state lives in `lib/wizardContext.tsx` using React Context API:
 
 ```typescript
 WizardState {
-  step: 1-6
+  step: 1-7
+
+  // Role-level data
   jobDescription: string
   duration: 30 | 45 | 60
-  competencies: Competency[]
-  questions: Question[]
-  agenda: AgendaItem[]
-  rubric: RubricCriterion[]
+  competencies: Competency[]  // ALL role competencies (3-5)
+  rubric: RubricCriterion[]   // Role-level rubrics for ALL competencies
+
+  // Interview-level data
+  interviewType?: InterviewType        // Type of THIS interview
+  interviewFocus?: string              // Focus description
+  selectedCompetencyIds: string[]      // Which competencies THIS interview assesses (1-3)
+  questions: Question[]                // Questions for selected competencies only
+  agenda: AgendaItem[]                 // Timeline for THIS interview
+
+  // Metadata
   createdAt: ISO string
   lastModified: ISO string
 }
@@ -79,27 +94,25 @@ WizardState {
 ```
 app/
 ├── components/
-│   ├── WizardLayout.tsx           # Master UI shell with progress bar
-│   ├── Step1_JobInput.tsx         # Job description + duration
-│   ├── Step2_CompetencyEditor.tsx # Edit 3-5 competencies
-│   ├── Step3_QuestionEditor.tsx   # Edit questions with time budget
-│   ├── Step4_AgendaBuilder.tsx    # Auto-generated timeline
-│   ├── Step5_RubricBuilder.tsx    # BARS rubric with 4 levels
-│   └── Step6_Results.tsx          # Export/print interface
+│   ├── WizardLayout.tsx            # Master UI shell with progress bar
+│   ├── Step1_JobInput.tsx          # Job description + duration
+│   ├── Step2_CompetencyEditor.tsx  # Edit 3-5 role competencies → generates rubrics
+│   ├── Step3_RubricEditor.tsx      # Edit BARS rubrics (all competencies)
+│   ├── Step4_InterviewFocus.tsx    # Select 1-3 competencies → generates questions
+│   ├── Step5_QuestionEditor.tsx    # Edit questions (selected competencies only)
+│   ├── Step6_AgendaBuilder.tsx     # Auto-generated timeline
+│   └── Step7_Results.tsx           # Export/print interface
 ├── api/
-│   ├── extract/competencies/      # POST - Extract competencies from JD
+│   ├── extract/competencies/       # POST - Extract competencies from JD
 │   └── generate/
-│       ├── questions/             # POST - Generate interview questions
-│       ├── rubric-from-competencies/ # POST - Generate BARS rubric
-│       └── agenda/                # POST - Legacy agenda generation
-└── page.tsx                       # Root client page with WizardProvider
+│       ├── questions/              # POST - Generate interview questions
+│       └── rubric-from-competencies/ # POST - Generate BARS rubric
+└── page.tsx                        # Root client page with WizardProvider
 
 lib/
-├── types.ts                       # TypeScript interfaces
-├── wizardContext.tsx              # React Context state management
-├── llm.ts                         # OpenRouter API integration
-├── exportMarkdown.ts              # Markdown export utility
-└── exportToClipboard.ts           # Clipboard copy utility
+├── types.ts                        # TypeScript interfaces
+├── wizardContext.tsx               # React Context state management
+└── llm.ts                          # OpenRouter API integration
 ```
 
 ### LLM Integration (lib/llm.ts)
@@ -265,7 +278,7 @@ competencies[0].name = 'New Name'
 ```
 
 ### 6. Auto-Generation with useEffect
-Step 4 auto-generates agenda on mount:
+Step 6 auto-generates agenda on mount:
 ```typescript
 useEffect(() => {
   if (questions.length > 0 && agenda.length === 0) {
@@ -318,16 +331,6 @@ Validation happens at two levels:
 2. **API-level:** Validate in route.ts before calling LLM
 
 Always provide clear error messages to guide user actions.
-
-## Legacy Code
-
-The following components/functions exist for backwards compatibility but are not actively used:
-- `app/components/InterviewForm.tsx` (replaced by wizard)
-- `app/components/ResultsDisplay.tsx` (replaced by Step6_Results)
-- `lib/llm.ts: generateAgenda()` (replaced by Step 4 auto-generation)
-- Old rubric format without BARS
-
-Do not use these for new features.
 
 ## Testing Notes
 

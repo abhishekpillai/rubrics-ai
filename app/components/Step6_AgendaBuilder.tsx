@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
 import { AgendaItem } from '@/lib/types';
 
-export default function Step4_AgendaBuilder() {
+export default function Step6_AgendaBuilder() {
   const { state, setAgenda, nextStep, prevStep } = useWizard();
   const [error, setError] = useState('');
 
@@ -62,7 +62,7 @@ export default function Step4_AgendaBuilder() {
   return (
     <div className="max-w-4xl">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">STEP 4: INTERVIEW AGENDA</h2>
+        <h2 className="text-3xl font-bold mb-2">STEP 6: INTERVIEW AGENDA</h2>
         <p className="text-sm opacity-70">
           Timeline view of your structured interview. Questions are sequenced with intro and
           candidate Q&A built in.

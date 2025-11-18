@@ -2,20 +2,12 @@
 
 import { useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
-import { RubricLevel, RubricLevelType } from '@/lib/types';
+import { RubricLevelType } from '@/lib/types';
 
-export default function Step5_RubricBuilder() {
+export default function Step3_RubricEditor() {
   const { state, setRubric, updateRubricCriterion, nextStep, prevStep } = useWizard();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
-
-  // Separate rubrics into selected (for this interview) and reference (not assessed here)
-  const selectedRubrics = state.rubric.filter((r) =>
-    state.selectedCompetencyIds?.includes(r.competencyId)
-  );
-  const referenceRubrics = state.rubric.filter(
-    (r) => !state.selectedCompetencyIds?.includes(r.competencyId)
-  );
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -85,7 +77,7 @@ export default function Step5_RubricBuilder() {
   return (
     <div className="max-w-7xl">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">STEP 5: EVALUATION RUBRIC</h2>
+        <h2 className="text-3xl font-bold mb-2">STEP 3: EDIT RUBRIC</h2>
         <p className="text-sm opacity-70">
           Behaviorally anchored rating scales (BARS) for each competency. Defines what
           poor/mixed/good/excellent looks like in observable terms.
@@ -97,7 +89,7 @@ export default function Step5_RubricBuilder() {
         <div className="border-2 border-black p-8 text-center mb-8">
           <p className="text-sm font-bold mb-2">NO RUBRIC YET</p>
           <p className="text-xs opacity-70">
-            Rubric is auto-generated when you continue from Step 4
+            Rubric is auto-generated when you continue from Step 2
           </p>
         </div>
       )}
@@ -105,29 +97,26 @@ export default function Step5_RubricBuilder() {
       {/* Rubric Criteria */}
       {state.rubric.length > 0 && (
         <>
-          {/* Selected Competencies Section */}
-          {selectedRubrics.length > 0 && (
-            <>
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-bold font-mono">
-                    COMPETENCIES ASSESSED IN THIS INTERVIEW ({selectedRubrics.length})
-                  </div>
-                  <div className="text-xs opacity-50 mt-1">
-                    These competencies will be evaluated in your {state.duration}-minute interview
-                  </div>
-                </div>
-                <button
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                  className="border border-black px-4 py-2 text-xs hover:bg-gray-100 transition-colors"
-                >
-                  REGENERATE ALL
-                </button>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <div className="text-sm font-bold font-mono">
+                ROLE COMPETENCIES ({state.rubric.length})
               </div>
+              <div className="text-xs opacity-50 mt-1">
+                Edit the evaluation rubric for all role competencies
+              </div>
+            </div>
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="border border-black px-4 py-2 text-xs hover:bg-gray-100 transition-colors"
+            >
+              REGENERATE ALL
+            </button>
+          </div>
 
-              <div className="space-y-8 mb-12">
-                {selectedRubrics.map((criterion) => {
+          <div className="space-y-8">
+            {state.rubric.map((criterion) => {
               const competency = state.competencies.find(
                 (c) => c.id === criterion.competencyId
               );
@@ -145,7 +134,7 @@ export default function Step5_RubricBuilder() {
                       </div>
                       <div className="text-xs">
                         WEIGHT: {criterion.weight}/5
-                        {'●'.repeat(criterion.weight)}{'○'.repeat(5 - criterion.weight)}
+                        {' '}{'●'.repeat(criterion.weight)}{'○'.repeat(5 - criterion.weight)}
                       </div>
                     </div>
                   </div>
@@ -239,112 +228,6 @@ export default function Step5_RubricBuilder() {
               );
             })}
           </div>
-        </>
-      )}
-
-      {/* Reference Competencies Section */}
-      {referenceRubrics.length > 0 && (
-        <>
-          <div className="mb-4 mt-12 border-t-2 border-dashed border-gray-400 pt-8">
-            <div className="text-sm font-bold font-mono mb-2">
-              REFERENCE RUBRICS (NOT ASSESSED IN THIS INTERVIEW)
-            </div>
-            <div className="text-xs opacity-50">
-              These are other role competencies not covered in your {state.duration}-minute interview.
-              Use for reference or future interview planning.
-            </div>
-          </div>
-
-          <div className="space-y-8 opacity-60">
-            {referenceRubrics.map((criterion) => {
-              const competency = state.competencies.find(
-                (c) => c.id === criterion.competencyId
-              );
-
-              return (
-                <div key={criterion.id} className="border-2 border-gray-400">
-                  {/* Header */}
-                  <div className="bg-gray-400 text-white px-6 py-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-lg font-bold">{criterion.competencyName}</div>
-                        <div className="text-xs opacity-70 mt-1">
-                          {competency?.description}
-                        </div>
-                      </div>
-                      <div className="text-xs">
-                        WEIGHT: {criterion.weight}/5
-                        {'●'.repeat(criterion.weight)}{'○'.repeat(5 - criterion.weight)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4-Level Matrix */}
-                  <div className="grid grid-cols-4">
-                    {(['poor', 'mixed', 'good', 'excellent'] as RubricLevelType[]).map(
-                      (levelType) => {
-                        const level = criterion.levels.find((l) => l.level === levelType);
-                        if (!level) return null;
-
-                        return (
-                          <div
-                            key={levelType}
-                            className="border-r border-gray-400 last:border-r-0"
-                          >
-                            {/* Level Header */}
-                            <div className="bg-gray-100 border-b border-gray-400 px-4 py-2 text-center">
-                              <div className="text-xs font-bold">
-                                {getLevelLabel(levelType)}
-                              </div>
-                            </div>
-
-                            {/* Description */}
-                            <div className="border-b border-gray-400 p-4">
-                              <div className="text-xs">{level.description}</div>
-                            </div>
-
-                            {/* Indicators */}
-                            <div className="p-4">
-                              <div className="text-xs font-bold mb-2 opacity-50">
-                                OBSERVABLE INDICATORS
-                              </div>
-                              {level.indicators.map((indicator, idx) => (
-                                <div key={idx} className="text-xs mb-2 flex gap-2">
-                                  <span>•</span>
-                                  <span>{indicator}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-
-                  {/* Non-Signals (Equity Focus) */}
-                  {criterion.nonSignals && criterion.nonSignals.length > 0 && (
-                    <div className="border-t-2 border-gray-400 bg-gray-100 p-4">
-                      <div className="text-xs font-bold mb-2">
-                        ⚠ NON-SIGNALS (Do NOT evaluate these)
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {criterion.nonSignals.map((signal, idx) => (
-                          <div
-                            key={idx}
-                            className="border border-gray-400 px-3 py-1 text-xs bg-white"
-                          >
-                            {signal}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
         </>
       )}
 

@@ -62,7 +62,7 @@ export default function Step2_CompetencyEditor() {
       return;
     }
 
-    // Auto-generate rubrics before moving to step 2.5
+    // Auto-generate rubrics before moving to step 3
     setIsGeneratingRubric(true);
     setError('');
 

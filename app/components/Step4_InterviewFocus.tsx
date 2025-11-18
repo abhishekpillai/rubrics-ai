@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
 import { InterviewType } from '@/lib/types';
 
-export default function Step2_5_InterviewFocus() {
+export default function Step4_InterviewFocus() {
   const {
     state,
     setInterviewType,
@@ -115,7 +115,7 @@ export default function Step2_5_InterviewFocus() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold font-mono mb-2">INTERVIEW FOCUS</h2>
+        <h2 className="text-2xl font-bold font-mono mb-2">STEP 4: INTERVIEW FOCUS</h2>
         <p className="text-sm opacity-70">
           Select which competencies THIS interview will assess (1-3 recommended)
         </p>

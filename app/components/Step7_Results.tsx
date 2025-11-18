@@ -54,7 +54,7 @@ export default function Step6_Results() {
         lines.push(`Focus: ${state.interviewFocus}`);
       }
       const selectedCompetencies = state.competencies.filter((c) =>
-        state.selectedCompetencyIds?.includes(c.id)
+        state.selectedCompetencyIds.includes(c.id)
       );
       lines.push(`Assessing: ${selectedCompetencies.map((c) => c.name).join(', ')}`);
     }
@@ -119,7 +119,7 @@ export default function Step6_Results() {
         lines.push(`**Focus:** ${state.interviewFocus}\n`);
       }
       const selectedCompetencies = state.competencies.filter((c) =>
-        state.selectedCompetencyIds?.includes(c.id)
+        state.selectedCompetencyIds.includes(c.id)
       );
       lines.push(`**Assessing:** ${selectedCompetencies.map((c) => c.name).join(', ')}\n`);
     }

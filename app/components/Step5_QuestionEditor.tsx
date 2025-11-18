@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
 import { Question, QuestionType } from '@/lib/types';
 
-export default function Step3_QuestionEditor() {
+export default function Step5_QuestionEditor() {
   const { state, setQuestions, updateQuestion, deleteQuestion, nextStep, prevStep } = useWizard();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -12,7 +12,7 @@ export default function Step3_QuestionEditor() {
 
   // Get selected competencies for this interview
   const selectedCompetencies = state.competencies.filter((c) =>
-    state.selectedCompetencyIds?.includes(c.id)
+    state.selectedCompetencyIds.includes(c.id)
   );
 
   const handleGenerate = async () => {
@@ -101,7 +101,7 @@ export default function Step3_QuestionEditor() {
   return (
     <div className="max-w-6xl">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">STEP 3: GENERATE QUESTIONS</h2>
+        <h2 className="text-3xl font-bold mb-2">STEP 5: EDIT QUESTIONS</h2>
         <p className="text-sm opacity-70">
           Create behavioral and situational questions that assess each competency. Mix "Tell
           me about a time..." (behavioral) with "What would you do if..." (situational).
