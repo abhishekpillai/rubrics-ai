@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { WizardState, WizardStep, Competency, Question, AgendaItem, RubricCriterion, InterviewDuration } from './types';
+import { WizardState, WizardStep, Competency, Question, AgendaItem, RubricCriterion, InterviewDuration, InterviewType } from './types';
 
 const STORAGE_KEY = 'rubrics-ai-wizard-state';
 
@@ -11,6 +11,7 @@ const getInitialState = (): WizardState => ({
   jobDescription: '',
   duration: 30,
   competencies: [],
+  selectedCompetencyIds: [],
   questions: [],
   agenda: [],
   rubric: [],
@@ -29,6 +30,10 @@ interface WizardContextType {
   // Job description & duration
   setJobDescription: (jd: string) => void;
   setDuration: (duration: InterviewDuration) => void;
+  // Interview focus
+  setInterviewType: (type: InterviewType) => void;
+  setInterviewFocus: (focus: string) => void;
+  setSelectedCompetencies: (ids: string[]) => void;
   // Competencies
   setCompetencies: (competencies: Competency[]) => void;
   addCompetency: (competency: Competency) => void;
@@ -87,14 +92,18 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const goToStep = (step: WizardStep) => updateState({ step });
 
   const nextStep = () => {
-    if (state.step < 6) {
-      updateState({ step: (state.step + 1) as WizardStep });
+    const stepOrder = [1, 2, 2.5, 3, 4, 5, 6] as const;
+    const currentIndex = stepOrder.indexOf(state.step as typeof stepOrder[number]);
+    if (currentIndex < stepOrder.length - 1) {
+      updateState({ step: stepOrder[currentIndex + 1] });
     }
   };
 
   const prevStep = () => {
-    if (state.step > 1) {
-      updateState({ step: (state.step - 1) as WizardStep });
+    const stepOrder = [1, 2, 2.5, 3, 4, 5, 6] as const;
+    const currentIndex = stepOrder.indexOf(state.step as typeof stepOrder[number]);
+    if (currentIndex > 0) {
+      updateState({ step: stepOrder[currentIndex - 1] });
     }
   };
 
@@ -111,6 +120,19 @@ export function WizardProvider({ children }: { children: ReactNode }) {
 
   const setDuration = (duration: InterviewDuration) => {
     updateState({ duration });
+  };
+
+  // Interview focus
+  const setInterviewType = (interviewType: InterviewType) => {
+    updateState({ interviewType });
+  };
+
+  const setInterviewFocus = (interviewFocus: string) => {
+    updateState({ interviewFocus });
+  };
+
+  const setSelectedCompetencies = (selectedCompetencyIds: string[]) => {
+    updateState({ selectedCompetencyIds });
   };
 
   // Competencies
@@ -133,6 +155,8 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const deleteCompetency = (id: string) => {
     updateState({
       competencies: state.competencies.filter((c) => c.id !== id),
+      // Also remove from selectedCompetencyIds
+      selectedCompetencyIds: state.selectedCompetencyIds.filter((cid) => cid !== id),
       // Also remove related questions
       questions: state.questions.filter((q) => q.competencyId !== id),
     });
@@ -187,6 +211,9 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     reset,
     setJobDescription,
     setDuration,
+    setInterviewType,
+    setInterviewFocus,
+    setSelectedCompetencies,
     setCompetencies,
     addCompetency,
     updateCompetency,

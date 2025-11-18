@@ -41,9 +41,26 @@ export default function Step6_Results() {
     lines.push('='.repeat(60));
     lines.push(`Generated: ${new Date().toLocaleDateString()}`);
     lines.push(`Duration: ${state.duration} minutes`);
+
+    // Interview Focus (if specified)
+    if (state.interviewType || state.interviewFocus) {
+      lines.push('');
+      lines.push('INTERVIEW FOCUS');
+      lines.push('-'.repeat(60));
+      if (state.interviewType) {
+        lines.push(`Type: ${state.interviewType}`);
+      }
+      if (state.interviewFocus) {
+        lines.push(`Focus: ${state.interviewFocus}`);
+      }
+      const selectedCompetencies = state.competencies.filter((c) =>
+        state.selectedCompetencyIds?.includes(c.id)
+      );
+      lines.push(`Assessing: ${selectedCompetencies.map((c) => c.name).join(', ')}`);
+    }
     lines.push('');
 
-    // Competencies
+    // Competencies (ALL role competencies)
     lines.push('COMPETENCIES');
     lines.push('-'.repeat(60));
     state.competencies.forEach((c) => {
@@ -91,9 +108,25 @@ export default function Step6_Results() {
     lines.push('# Interview Guide\n');
     lines.push(`*Generated on ${new Date().toLocaleDateString()}*\n`);
     lines.push(`**Duration:** ${state.duration} minutes\n`);
-    lines.push('---\n');
 
-    // Competencies
+    // Interview Focus (if specified)
+    if (state.interviewType || state.interviewFocus) {
+      lines.push('\n## Interview Focus\n');
+      if (state.interviewType) {
+        lines.push(`**Type:** ${state.interviewType}\n`);
+      }
+      if (state.interviewFocus) {
+        lines.push(`**Focus:** ${state.interviewFocus}\n`);
+      }
+      const selectedCompetencies = state.competencies.filter((c) =>
+        state.selectedCompetencyIds?.includes(c.id)
+      );
+      lines.push(`**Assessing:** ${selectedCompetencies.map((c) => c.name).join(', ')}\n`);
+    }
+
+    lines.push('\n---\n');
+
+    // Competencies (ALL role competencies)
     lines.push('## Competencies\n');
     state.competencies.forEach((c) => {
       lines.push(`### ${c.name} ${c.isRequired ? '(REQUIRED)' : ''}\n`);

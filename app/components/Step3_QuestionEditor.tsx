@@ -10,6 +10,11 @@ export default function Step3_QuestionEditor() {
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Get selected competencies for this interview
+  const selectedCompetencies = state.competencies.filter((c) =>
+    state.selectedCompetencyIds?.includes(c.id)
+  );
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError('');
@@ -19,7 +24,7 @@ export default function Step3_QuestionEditor() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          competencies: state.competencies,
+          competencies: selectedCompetencies,
           duration: state.duration,
           modelQuality: 'standard',
         }),
@@ -44,7 +49,7 @@ export default function Step3_QuestionEditor() {
       id: `q-${Date.now()}`,
       text: 'Enter your question here...',
       type: 'behavioral',
-      competencyId: state.competencies[0]?.id || '',
+      competencyId: selectedCompetencies[0]?.id || '',
       timeAllocation: 5,
     };
     setQuestions([...state.questions, newQuestion]);
@@ -87,8 +92,8 @@ export default function Step3_QuestionEditor() {
   const isOverBudget = totalTime > maxTime;
   const isValid = state.questions.length > 0 && !isOverBudget;
 
-  // Group questions by competency for display
-  const questionsByCompetency = state.competencies.map((comp) => ({
+  // Group questions by competency for display (only selected competencies)
+  const questionsByCompetency = selectedCompetencies.map((comp) => ({
     competency: comp,
     questions: state.questions.filter((q) => q.competencyId === comp.id),
   }));
@@ -102,6 +107,27 @@ export default function Step3_QuestionEditor() {
           me about a time..." (behavioral) with "What would you do if..." (situational).
         </p>
       </div>
+
+      {/* Interview Focus Context */}
+      {(state.interviewType || state.interviewFocus) && (
+        <div className="mb-8 border-2 border-black p-4 bg-gray-50">
+          <div className="text-xs font-bold font-mono mb-2">INTERVIEW FOCUS</div>
+          {state.interviewType && (
+            <div className="text-sm mb-1">
+              <span className="opacity-50">Type:</span> {state.interviewType}
+            </div>
+          )}
+          {state.interviewFocus && (
+            <div className="text-sm">
+              <span className="opacity-50">Focus:</span> {state.interviewFocus}
+            </div>
+          )}
+          <div className="text-sm mt-2">
+            <span className="opacity-50">Assessing:</span>{' '}
+            {selectedCompetencies.map((c) => c.name).join(', ')}
+          </div>
+        </div>
+      )}
 
       {/* Show message if no questions yet */}
       {state.questions.length === 0 && (

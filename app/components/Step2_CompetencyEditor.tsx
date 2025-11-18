@@ -5,7 +5,7 @@ import { useWizard } from '@/lib/wizardContext';
 import { Competency } from '@/lib/types';
 
 export default function Step2_CompetencyEditor() {
-  const { state, setCompetencies, updateCompetency, deleteCompetency, setQuestions, nextStep, prevStep } = useWizard();
+  const { state, setCompetencies, updateCompetency, deleteCompetency, setRubric, nextStep, prevStep } = useWizard();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export default function Step2_CompetencyEditor() {
     setEditingId(newComp.id);
   };
 
-  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [isGeneratingRubric, setIsGeneratingRubric] = useState(false);
 
   const handleContinue = async () => {
     if (state.competencies.length < 3) {
@@ -62,17 +62,16 @@ export default function Step2_CompetencyEditor() {
       return;
     }
 
-    // Auto-generate questions before moving to step 3
-    setIsGeneratingQuestions(true);
+    // Auto-generate rubrics before moving to step 2.5
+    setIsGeneratingRubric(true);
     setError('');
 
     try {
-      const response = await fetch('/api/generate/questions', {
+      const response = await fetch('/api/generate/rubric-from-competencies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           competencies: state.competencies,
-          duration: state.duration,
           modelQuality: 'standard',
         }),
       });
@@ -80,15 +79,15 @@ export default function Step2_CompetencyEditor() {
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Failed to generate questions');
+        throw new Error(result.error || 'Failed to generate rubric');
       }
 
-      setQuestions(result.data);
+      setRubric(result.data);
       nextStep();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate questions');
+      setError(err instanceof Error ? err.message : 'Failed to generate rubric');
     } finally {
-      setIsGeneratingQuestions(false);
+      setIsGeneratingRubric(false);
     }
   };
 
@@ -252,30 +251,30 @@ export default function Step2_CompetencyEditor() {
       <div className="flex items-center gap-4">
         <button
           onClick={prevStep}
-          disabled={isGeneratingQuestions}
+          disabled={isGeneratingRubric}
           className="border-2 border-black px-8 py-4 text-sm font-bold hover:bg-gray-100 transition-colors disabled:opacity-30"
         >
           ← BACK
         </button>
         <button
           onClick={handleContinue}
-          disabled={!isValid || isGeneratingQuestions}
+          disabled={!isValid || isGeneratingRubric}
           className={`
             border-2 border-black px-8 py-4 text-sm font-bold transition-colors
             ${
-              isValid && !isGeneratingQuestions
+              isValid && !isGeneratingRubric
                 ? 'bg-black text-white hover:bg-gray-900'
                 : 'opacity-30 cursor-not-allowed'
             }
           `}
         >
-          {isGeneratingQuestions ? 'GENERATING QUESTIONS...' : 'CONTINUE →'}
+          {isGeneratingRubric ? 'GENERATING RUBRIC...' : 'CONTINUE →'}
         </button>
         <div className="text-xs opacity-50">
           {!isValid &&
             state.competencies.length > 0 &&
             `Need ${3 - state.competencies.length} more competencies`}
-          {isGeneratingQuestions && 'Creating interview questions...'}
+          {isGeneratingRubric && 'Creating evaluation rubric...'}
         </div>
       </div>
 

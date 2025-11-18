@@ -75,18 +75,30 @@ export interface AgendaItem {
   questionId?: string; // Optional link to specific question
 }
 
-// Wizard step
-export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
+// Interview type options
+export type InterviewType = 'technical' | 'behavioral' | 'system-design' | 'domain' | 'custom';
+
+// Wizard step (includes new step 2.5 for interview focus)
+export type WizardStep = 1 | 2 | 2.5 | 3 | 4 | 5 | 6;
 
 // Wizard state (complete interview design session)
 export interface WizardState {
   step: WizardStep;
+
+  // Role-level data
   jobDescription: string;
+  competencies: Competency[]; // ALL role competencies (3-5)
+  rubric: RubricCriterion[]; // Role-level rubrics for ALL competencies
+
+  // Interview-level data
+  interviewType?: InterviewType; // Type of this specific interview
+  interviewFocus?: string; // Optional description of interview focus
+  selectedCompetencyIds: string[]; // Which competencies THIS interview assesses
   duration: InterviewDuration;
-  competencies: Competency[];
-  questions: Question[];
+  questions: Question[]; // Questions for selected competencies only
   agenda: AgendaItem[];
-  rubric: RubricCriterion[];
+
+  // Metadata
   createdAt: string;
   lastModified: string;
 }

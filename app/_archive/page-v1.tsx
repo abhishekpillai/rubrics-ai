@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import InterviewForm from './components/InterviewForm';
-import ResultsDisplay from './components/ResultsDisplay';
+import InterviewForm from './InterviewForm-v1';
+import ResultsDisplay from '../components/ResultsDisplay';
 import { InterviewPreparation, InterviewDuration } from '@/lib/types';
 
 export default function Home() {

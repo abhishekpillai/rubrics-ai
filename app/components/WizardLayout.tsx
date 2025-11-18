@@ -6,9 +6,10 @@ import { WizardStep } from '@/lib/types';
 const STEP_LABELS = [
   { number: 1, label: 'Job Description' },
   { number: 2, label: 'Define Competencies' },
+  { number: 2.5, label: 'Interview Focus' },
   { number: 3, label: 'Generate Questions' },
   { number: 4, label: 'Build Agenda' },
-  { number: 5, label: 'Create Rubric' },
+  { number: 5, label: 'Review Rubric' },
   { number: 6, label: 'Results' },
 ];
 
@@ -26,7 +27,10 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
     }
   };
 
-  const progressPercent = ((state.step - 1) / 5) * 100;
+  // Calculate progress accounting for step 2.5
+  const stepOrder = [1, 2, 2.5, 3, 4, 5, 6];
+  const currentStepIndex = stepOrder.indexOf(state.step);
+  const progressPercent = (currentStepIndex / (stepOrder.length - 1)) * 100;
 
   return (
     <div className="min-h-screen bg-white font-mono">
@@ -51,7 +55,7 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm">
-              STEP {state.step} OF 6
+              STEP {state.step} OF 7
             </div>
             <div className="text-sm">
               {progressPercent.toFixed(0)}% COMPLETE
@@ -69,7 +73,7 @@ export default function WizardLayout({ children }: WizardLayoutProps) {
       {/* Step Navigation */}
       <nav className="border-b border-black">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <ol className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          <ol className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
             {STEP_LABELS.map((step) => {
               const isActive = state.step === step.number;
               const isCompleted = state.step > step.number;
