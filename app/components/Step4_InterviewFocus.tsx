@@ -239,7 +239,7 @@ export default function Step4_InterviewFocus() {
           <h3 className="text-xs font-bold font-mono mb-4">TIME BUDGET PREVIEW</h3>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-mono font-bold">{state.duration}</div>
+              <div className="text-2xl font-mono font-bold">{durationValue}</div>
               <div className="text-xs opacity-70">Minutes Total</div>
             </div>
             <div>
