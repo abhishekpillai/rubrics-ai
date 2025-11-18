@@ -10,6 +10,7 @@ export default function Step4_InterviewFocus() {
     setInterviewType,
     setInterviewFocus,
     setSelectedCompetencies,
+    setDuration,
     setQuestions,
     nextStep,
   } = useWizard();
@@ -23,6 +24,7 @@ export default function Step4_InterviewFocus() {
       ? state.selectedCompetencyIds
       : []
   );
+  const [durationValue, setDurationValue] = useState(state.duration);
   const [interviewTypeValue, setInterviewTypeValue] = useState<InterviewType | ''>(
     state.interviewType || ''
   );
@@ -32,7 +34,7 @@ export default function Step4_InterviewFocus() {
 
   // Calculate time estimates
   const questionsPerCompetency = 2.5; // Average 2-3 questions
-  const minutesPerQuestion = state.duration / (selectedIds.length * questionsPerCompetency + 2); // +2 for intro/outro buffer
+  const minutesPerQuestion = durationValue / (selectedIds.length * questionsPerCompetency + 2); // +2 for intro/outro buffer
   const estimatedQuestions = Math.round(selectedIds.length * questionsPerCompetency);
 
   // Handle checkbox toggle
@@ -44,9 +46,9 @@ export default function Step4_InterviewFocus() {
 
   // Smart recommendation: suggest 2-3 competencies based on duration
   const getRecommendedCount = () => {
-    if (state.duration === 30) return 2;
-    if (state.duration === 45) return 2;
-    if (state.duration === 60) return 3;
+    if (durationValue === 30) return 2;
+    if (durationValue === 45) return 2;
+    if (durationValue === 60) return 3;
     return 2;
   };
 
@@ -74,6 +76,7 @@ export default function Step4_InterviewFocus() {
 
     try {
       // Save selections to context
+      setDuration(durationValue);
       setSelectedCompetencies(selectedIds);
       if (interviewTypeValue) {
         setInterviewType(interviewTypeValue);
@@ -92,7 +95,7 @@ export default function Step4_InterviewFocus() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           competencies: selectedCompetencies,
-          duration: state.duration,
+          duration: durationValue,
           modelQuality: 'standard',
         }),
       });
@@ -117,11 +120,37 @@ export default function Step4_InterviewFocus() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold font-mono mb-2">STEP 4: INTERVIEW FOCUS</h2>
         <p className="text-sm opacity-70">
-          Select which competencies THIS interview will assess (1-3 recommended)
+          Define the scope and duration for THIS specific interview
         </p>
       </div>
 
-      {/* Interview Type Selector */}
+      {/* Interview Duration */}
+      <div className="mb-8">
+        <label className="block mb-3">
+          <span className="text-sm font-bold">INTERVIEW DURATION</span>
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {[30, 45, 60].map((duration) => (
+            <button
+              key={duration}
+              onClick={() => setDurationValue(duration as any)}
+              disabled={isLoading}
+              className={`
+                border-2 border-black p-4 text-sm font-bold transition-colors
+                ${durationValue === duration ? 'bg-black text-white' : 'bg-white hover:bg-gray-100'}
+                ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+            >
+              {duration} MIN
+            </button>
+          ))}
+        </div>
+        <p className="text-xs opacity-50 mt-2">
+          Duration for THIS interview (you can run multiple interviews with different durations)
+        </p>
+      </div>
+
+      {/* Interview Type & Focus */}
       <div className="mb-8 border-2 border-black p-6 bg-white">
         <label className="block text-xs font-bold mb-3 font-mono">
           INTERVIEW TYPE (OPTIONAL)

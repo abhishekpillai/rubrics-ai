@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import { useWizard } from '@/lib/wizardContext';
-import { InterviewDuration } from '@/lib/types';
 
 export default function Step1_JobInput() {
-  const { state, setJobDescription, setDuration, setCompetencies, nextStep } = useWizard();
+  const { state, setJobDescription, setCompetencies, nextStep } = useWizard();
   const [localJD, setLocalJD] = useState(state.jobDescription);
-  const [localDuration, setLocalDuration] = useState(state.duration);
   const [error, setError] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
 
@@ -19,7 +17,6 @@ export default function Step1_JobInput() {
     }
 
     setJobDescription(localJD);
-    setDuration(localDuration);
 
     // Auto-extract competencies before moving to step 2
     setIsExtracting(true);
@@ -95,30 +92,6 @@ Key Responsibilities:
         </label>
       </div>
 
-      {/* Interview Duration */}
-      <div className="mb-8">
-        <label className="block mb-3">
-          <span className="text-sm font-bold">INTERVIEW DURATION</span>
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          {([30, 45, 60] as InterviewDuration[]).map((duration) => (
-            <button
-              key={duration}
-              onClick={() => setLocalDuration(duration)}
-              className={`
-                border-2 border-black p-4 text-sm font-bold transition-colors
-                ${localDuration === duration ? 'bg-black text-white' : 'bg-white hover:bg-gray-100'}
-              `}
-            >
-              {duration} MIN
-            </button>
-          ))}
-        </div>
-        <p className="text-xs opacity-50 mt-2">
-          Selected duration will determine question count and time allocations
-        </p>
-      </div>
-
       {/* Error Message */}
       {error && (
         <div className="mb-8 border-2 border-black bg-white p-4">
@@ -156,16 +129,16 @@ Key Responsibilities:
 
       {/* Info Box */}
       <div className="mt-16 border-t border-black pt-8">
-        <h3 className="text-xs font-bold mb-3">WHY THIS MATTERS</h3>
+        <h3 className="text-xs font-bold mb-3">COMPETENCY-BASED HIRING</h3>
         <div className="text-xs opacity-70 leading-relaxed space-y-2">
           <p>
             Research shows that competency-based interviews are more predictive of job
             performance than unstructured interviews (validity coefficient: 0.51 vs 0.38).
           </p>
           <p>
-            By starting with the job description, we ensure every question and evaluation
-            criterion is directly relevant to the role—not based on vague "culture fit"
-            or irrelevant signals.
+            We'll extract 3-5 critical competencies from your job description. These form
+            the foundation for role-level evaluation rubrics. Later, you'll select which
+            competencies to assess in each specific interview.
           </p>
         </div>
       </div>
